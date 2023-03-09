@@ -1,0 +1,62 @@
+// cSpell Settings
+{
+  // Version of the setting file.  Always 0.2
+  "version": "0.2",
+  // language - current active spelling language
+  "language": "en",
+  // words - list of words to be always considered correct
+  "words": [
+    "antd",
+    "Aplayer",
+    "arrayutil",
+    "Artplayer",
+    "asticode",
+    "astisub",
+    "Bilibili",
+    "breadcrumbitem",
+    "Casbin",
+    "cavaliergopher",
+    "Clonable",
+    "commitlint",
+    "Danmaku",
+    "danmu",
+    "Danmuku",
+    "dplayer",
+    "filelist",
+    "filesize",
+    "folderlist",
+    "fsys",
+    "gonic",
+    "GOPROXY",
+    "goserver",
+    "goversion",
+    "leetcode",
+    "loglevel",
+    "logn",
+    "mudssky",
+    "myerror",
+    "nplayer",
+    "nums",
+    "Qrcode",
+    "reduxjs",
+    "slidev",
+    "stretchr",
+    "swaggo",
+    "sysinfo",
+    "tailwindcss",
+    "tcase",
+    "threejs",
+    "userlist",
+    "USERPROFILE",
+    "videoplay",
+    "watchexec",
+    "webpermission"
+  ],
+  // flagWords - list of words to be always considered incorrect
+  // This is useful for offensive words and common spelling errors.
+  // For example "hte" should be "the"
+  "flagWords": [],
+  "enabled": true,
+  //  允许组合词
+  "allowCompoundWords": true
+}

@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 use regex::Regex;
+use unicode_segmentation::UnicodeSegmentation;
 
 /// 对文件名字符串进行处理的程序,用于文件重命名的时候去除非法字符串和emojis
 #[derive(Parser, Debug)]
@@ -114,10 +115,18 @@ fn windows_legaling_name(filename: &str) -> String {
 // 引入emojis包,遍历每个字符,判断是否为emoji,如果是就移除
 fn replace_emojis(text: &str) -> String {
     let mut new_text = String::new();
-    for c in text.chars() {
-        let current_char_str = c.to_string();
-        if let None = emojis::get(&current_char_str) {
-            new_text.push_str(&current_char_str)
+
+    let grapheme_clusters = UnicodeSegmentation::graphemes(text, true).collect::<Vec<&str>>();
+    for c in grapheme_clusters {
+        // println!("{}", c);
+        let chars = c.chars();
+        let count = chars.count();
+        // unicode字符数量大于1，说明是一个符合字符，可能是emoji
+        if count > 1 {
+            continue;
+        }
+        if let None = emojis::get(c) {
+            new_text.push_str(c);
         }
     }
     new_text
@@ -132,11 +141,22 @@ fn check_emojis(text: &str) -> bool {
     return false;
 }
 
+///获取字符串中的所有emoji，拼接emoji到新字符串
 fn get_emojis(text: &str) -> String {
     let mut new_text = String::new();
-    for c in text.chars() {
-        let current_char_str = c.to_string();
-        if let Some(emoji) = emojis::get(&current_char_str) {
+    // 使用unicode分段器，将包含unicode字符串按照unicode分开成列表
+    // 如果直接用text.chars(),有些emoji表情整体不能被当成一个字符，会被拆分开导致错误。
+    let grapheme_clusters = UnicodeSegmentation::graphemes(text, true).collect::<Vec<&str>>();
+    for c in grapheme_clusters {
+        // println!("{}", c);
+        let chars = c.chars();
+        let count = chars.count();
+        // unicode字符数量大于1，说明是一个符合字符，可能是emoji
+        if count > 1 {
+            new_text.push_str(c);
+            continue;
+        }
+        if let Some(emoji) = emojis::get(c) {
             new_text.push_str(emoji.as_str())
         }
     }
@@ -151,4 +171,50 @@ fn get_windows_illegal_characters(text: &str) -> String {
         new_text.push_str(i.as_str());
     }
     new_text
+}
+
+pub fn count_emojis(s: &str) -> usize {
+    UnicodeSegmentation::graphemes(s, true)
+        .filter(|g| g.chars().any(is_emoji))
+        .count()
+}
+
+pub fn is_emoji(c: char) -> bool {
+    match c {
+        '\u{1F300}'..='\u{1F5FF}'
+        | '\u{1F600}'..='\u{1F64F}'
+        | '\u{1F680}'..='\u{1F6FF}'
+        | '\u{2600}'..='\u{26FF}'
+        | '\u{2700}'..='\u{27BF}'
+        | '\u{1F900}'..='\u{1F9FF}' => true,
+        _ => false,
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::get_emojis;
+    #[test]
+    fn test_get_emojis() {
+        assert_eq!(get_emojis("我"), "");
+        assert_eq!(get_emojis("hello"), "");
+        assert_eq!(get_emojis("👋 Hello, 🌎!"), "👋🌎");
+        assert_eq!(get_emojis("😃🌈"), "😃🌈");
+        assert_eq!(get_emojis("👍+😃=😍"), "👍😃😍");
+        assert_eq!(get_emojis("❤️"), "❤️");
+        assert_eq!(get_emojis("🏳️‍🌈"), "🏳️‍🌈");
+        assert_eq!(get_emojis("🐱‍🏍"), "🐱‍🏍");
+    }
+
+    #[test]
+    fn test_replace_emojis() {
+        assert_eq!(replace_emojis("Hello, 🌎! 🏳️‍🌈"), "Hello, ! ");
+        assert_eq!(replace_emojis("No emojis here"), "No emojis here");
+        assert_eq!(replace_emojis(""), "");
+        // 目前还无法处理多宽度字符的表情
+        assert_eq!(
+            replace_emojis("Emoji 1: ❤️, Emoji 2: 🚀, Emoji 3: 🐱‍🏍"),
+            "Emoji 1: , Emoji 2: , Emoji 3: "
+        );
+    }
 }
