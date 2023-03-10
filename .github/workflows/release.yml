@@ -53,6 +53,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Rust
         run: rustup update 1.67.1 --no-self-update && rustup default 1.67.1
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.2.1
+      - name: Run test
+        run: cargo test
       - name: Install cargo-dist
         run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/axodotdev/cargo-dist/releases/download/v0.0.4/cargo-dist-v0.0.4-installer.sh | sh
       - id: create-release
@@ -102,8 +106,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Rust
         run: rustup update 1.67.1 --no-self-update && rustup default 1.67.1
-      - name: Run test
-        run: cargo test
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.2.1
       - name: Install cargo-dist
         run: ${{ matrix.install-dist }}
       - name: Run cargo-dist
