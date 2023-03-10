@@ -9,7 +9,8 @@ use crate::{
     win_illegal::{get_windows_illegal_characters, replace_win_illegal},
 };
 
-/// 对文件名字符串进行处理的程序,用于文件重命名的时候去除非法字符串和emojis
+//对文件名字符串进行处理的程序,用于文件重命名的时候去除非法字符串和emojis
+/// deal with filename, remove illegal strings and emojis when file renaming
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
@@ -19,35 +20,44 @@ struct Cli {
 }
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// 检查字符串是否符合匹配条件,比如是否含有emoji或者windows下的非法字符
+    // 检查字符串是否符合匹配条件,比如是否含有emoji或者windows下的非法字符
+    /// check if the string is valid
     Check {
-        /// 输入的字符串
+        //输入的字符串
         // #[arg(short, long)]
         input_text: String,
-        /// 是否存在emoji
+        // 是否存在emoji
+        ///check whether emoji exists
         #[arg(long, default_value_t = true)]
         has_emoji: bool,
 
-        /// 是否存在windows中的非法字符 r#"[\\/:*?"<>|]"#
+        //是否存在windows中的非法字符 r#"[\\/:*?"<>|]"#
+        ///check windows illegal character exists
         #[arg(long, default_value_t = true)]
         has_windows_illegal_characters: bool,
 
-        /// 显示更详细的信息
+        // 显示更详细的信息
+        ///show detailed information
         #[arg(short, long)]
         verbose: bool,
     },
-    /// 替换字符串中的非法字符
+    //替换字符串中的非法字符
+    /// replace the illegal characters
     Replace {
-        /// 输入的字符串
+        // 输入的字符串
+        /// input string
         // #[arg(short, long)]
         input_text: String,
-        /// 是否移除emojis
+        //是否移除emojis
+        /// whether remove emoji
         #[arg(long, default_value_t = true)]
         remove_emoji: bool,
-        /// 是否移除windows文件名不合法的字符
+        // 是否移除windows文件名不合法的字符
+        /// whether remove windows illegal characters
         #[arg(long, default_value_t = true)]
         remove_windows_illegal_characters: bool,
-        ///  匹配移除的字符的正则
+        // 匹配移除的字符的正则
+        /// remove matched characters
         #[arg(short = 'p', long)]
         remove_pattern: Option<String>,
     },

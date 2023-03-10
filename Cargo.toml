@@ -2,6 +2,9 @@
 name = "rename-legal"
 version = "0.1.1"
 edition = "2021"
+description = "deal with filename, remove illegal strings and emojis when file renaming"
+license = "MIT"
+homepage = "https://github.com/mudssky/rename-legal"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
